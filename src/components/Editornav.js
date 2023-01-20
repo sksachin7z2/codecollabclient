@@ -23,7 +23,7 @@ function Editornav({source,chat,setChat,compiler,room,handlesendcode,whiteBoard,
    
     }
     // const host="http:localhost:5000";
-    const host="https://codecollab7z2.onrender.com";
+    const host="https://codecollabclient-93wj.vercel.app";
 
   return (
     <div>
