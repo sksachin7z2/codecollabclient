@@ -8,7 +8,7 @@ class Board extends React.Component {
   
     timeout;
     
-    socket = io("https://codecollab7z2.herokuapp.com");
+    socket = io("https://codecollab7z2.onrender.com");
     // socket = io("http://localhost:5000");
 
     ctx;
