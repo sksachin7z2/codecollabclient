@@ -168,7 +168,7 @@ let videos=document.getElementById("videos")
     newVid.id = socket_id
     newVid.playsinline = false
     newVid.autoplay = true
-    newVid.muted=true
+    // newVid.muted=true
     newVid.className = "vid"
     newVid.onclick = () => openPictureMode(newVid)
     newVid.ontouchstart = (e) => openPictureMode(newVid)
