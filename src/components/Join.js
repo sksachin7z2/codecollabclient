@@ -2,8 +2,8 @@ import React,{useState,useEffect} from 'react'
 import {  useNavigate } from 'react-router-dom';
 import Spinner from './Spinner';
 function Join({notify}) {
-  // const host="https://codecollab7z2.onrender.com";
-  const host="http://localhost:5000";
+  const host="https://codecollab7z2-8g25.onrender.com";
+  // const host="http://localhost:5000";
   const [loading, setLoading] = useState(false)
   let navigate=useNavigate();
   useEffect(() => {

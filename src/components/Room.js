@@ -115,8 +115,8 @@ const [help, sethelp] = useState(true)
   
   
    
-const ENDPOINT="http://localhost:5000";
-// const ENDPOINT="https://codecollab7z2.onrender.com";
+// const ENDPOINT="http://localhost:5000";
+const ENDPOINT="https://codecollab7z2-8g25.onrender.com";
 
 function removePeer(socket_id) {
 console.log(socket_id,"hjbh")

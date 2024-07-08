@@ -32,9 +32,9 @@ function Editornav({colormic,colorvid, muteButton,vidButton,localVideo,videos, s
         setContri(!contri)
    
     }
-    const host="http:localhost:5000";
-    const clienthost="http://localhost:3000"
-    // const host="https://codecollab7z2.onrender.com";
+    // const host="http:localhost:5000";
+    const clienthost="https://codecollab7z2-8g25.onrender.com"
+    const host="https://codecollab7z2-8g25.onrender.com";
 
   return (
     <div>
