@@ -1,10 +1,22 @@
-import React from 'react'
+import React,{useEffect} from 'react'
 // import {Link} from 'react-router-dom'
 import { OTSession, OTPublisher, OTStreams, OTSubscriber } from 'opentok-react';
 import '@opentok/client'
-import {BsFillChatLeftDotsFill,BsHeadset,BsShareFill,BsFileEarmarkArrowDown ,BsPlayFill,BsSaveFill} from 'react-icons/bs'
+import SimplePeer from 'simple-peer';
+import {BsFillChatLeftDotsFill,BsHeadset,BsShareFill,BsFileEarmarkArrowDown ,BsPlayFill,BsSaveFill,BsMic,BsCameraVideoFill, BsMicFill } from 'react-icons/bs'
 import {BiChalkboard} from 'react-icons/bi'
-function Editornav({source,chat,setChat,compiler,room,handlesendcode,whiteBoard,setWhiteBoard,download,notify,contri,setContri}) {
+
+
+
+function Editornav({colormic,colorvid, muteButton,vidButton,localVideo,videos, switchMedia,toggleMute,toggleVid,source,chat,setChat,compiler,room,handlesendcode,whiteBoard,setWhiteBoard,download,notify,contri,setContri}) {
+
+
+  
+  /**
+   * initialize the socket connections
+   */
+  
+  
     
     const handlevisibile=()=>{
       var ele=document.getElementById('voicee');
@@ -16,14 +28,16 @@ function Editornav({source,chat,setChat,compiler,room,handlesendcode,whiteBoard,
       else{
         ele.classList.add("voice1");
       }
+
     }
     const handleclick=()=>{
      if(window.innerWidth<=767)
         setContri(!contri)
    
     }
-    // const host="http:localhost:5000";
-    const host="https://codecollabclient-93wj.vercel.app";
+    const host="http:localhost:5000";
+    const clienthost="http://localhost:3000"
+    // const host="https://codecollab7z2.onrender.com";
 
   return (
     <div>
@@ -83,7 +97,7 @@ function Editornav({source,chat,setChat,compiler,room,handlesendcode,whiteBoard,
                 
                 <li onMouseOver={()=>{document.getElementById('share').style.display="block"}} onMouseLeave={()=>{document.getElementById('share').style.display="none"}}>
                   <div>
-                <button onClick={()=>{window.navigator.clipboard.writeText(`${host}/room?room=${room}&sessionId=${localStorage.getItem('sessionId')}&token=${localStorage.getItem('token')}`);notify("link copied")}} className='text-white text-lg sm:px-3'><BsShareFill/></button>
+                <button onClick={()=>{window.navigator.clipboard.writeText(`${clienthost}/room?room=${room}`);notify("link copied")}} className='text-white text-lg sm:px-3'><BsShareFill/></button>
 
                   </div>
                   <div id='share' className='hidden text-white bg-black p-2 rounded-md absolute top-[7rem]'>
@@ -101,7 +115,7 @@ function Editornav({source,chat,setChat,compiler,room,handlesendcode,whiteBoard,
                   </div>
                   <div id='voicee' className='voice1 absolute top-[7rem] z-20'>
                   
-  <OTSession apiKey="47536461" sessionId={localStorage.getItem('sessionId')} token={localStorage.getItem('token')}>
+  {/* <OTSession apiKey="47759051" sessionId={localStorage.getItem('sessionId')} token={localStorage.getItem('token')}>
 <div className="sm:grid sm:grid-cols-2">
         <OTPublisher properties={{ width: 50, height: 50 ,publishVideo:false}}/>
         <OTStreams>
@@ -111,8 +125,16 @@ function Editornav({source,chat,setChat,compiler,room,handlesendcode,whiteBoard,
           
         </OTStreams>
         </div>
-      </OTSession>
-      
+      </OTSession> */}
+   
+   <div  id="videos" class="container flex">
+        <video  id="localVideo" class="vid" autoPlay ></video>
+    </div>
+
+    <div className='space-x-3 pt-2'>
+        <button  id="muteButton" class="settings" onClick={toggleMute}><BsMicFill color={colormic} size={20}/></button>
+        <button  id="vidButton" class="settings" onClick={toggleVid}><BsCameraVideoFill color={colorvid} size={20} /></button>
+    </div>
                   </div>
                 </li>
                 <li  onMouseOver={()=>{document.getElementById('chat').style.display="block"}} onMouseLeave={()=>{document.getElementById('chat').style.display="none"}}>

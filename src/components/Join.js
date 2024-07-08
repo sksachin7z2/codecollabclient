@@ -2,8 +2,8 @@ import React,{useState,useEffect} from 'react'
 import {  useNavigate } from 'react-router-dom';
 import Spinner from './Spinner';
 function Join({notify}) {
-  const host="https://codecollab7z2.onrender.com";
-  // const host="http://localhost:5000";
+  // const host="https://codecollab7z2.onrender.com";
+  const host="http://localhost:5000";
   const [loading, setLoading] = useState(false)
   let navigate=useNavigate();
   useEffect(() => {
@@ -24,21 +24,21 @@ function Join({notify}) {
       notify('Both name and Room required');
       return;
     }
-    setLoading(true);
-const response=await fetch(`${host}/token`,{
-  method:'POST',
+    // setLoading(true);
+// const response=await fetch(`${host}/token`,{
+//   method:'POST',
   
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  },
-  body:JSON.stringify({room:room})
-});
-const data=await response.json();
+//   headers: {
+//     'Content-Type': 'application/json',
+//     'Accept': 'application/json'
+//   },
+//   body:JSON.stringify({room:room})
+// });
+// const data=await response.json();
 setLoading(false)
 
-  localStorage.setItem('sessionId',data.sessionId);
-  localStorage.setItem('token',data.token);
+  // localStorage.setItem('sessionId',data.sessionId);
+  // localStorage.setItem('token',data.token);
   //can use context api but for now localstorage or directly to app.js
  
   
@@ -49,21 +49,21 @@ setLoading(false)
     room=room.split('@')[0];
     var name=localStorage.getItem('email');
     name=name.split('@')[0];
-      setLoading(true)
-    const response=await fetch(`${host}/token`,{
-  method:'POST',
+//       setLoading(true)
+//     const response=await fetch(`${host}/token`,{
+//   method:'POST',
   
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  },
-  body:JSON.stringify({room:room})
-});
-const data=await response.json();
+//   headers: {
+//     'Content-Type': 'application/json',
+//     'Accept': 'application/json'
+//   },
+//   body:JSON.stringify({room:room})
+// });
+// const data=await response.json();
 setLoading(false);
 
-  localStorage.setItem('sessionId',data.sessionId);
-  localStorage.setItem('token',data.token);
+  // localStorage.setItem('sessionId',data.sessionId);
+  // localStorage.setItem('token',data.token);
   //can use context api but for now localstorage or directly to app.js
   
   navigate(`/room?name=${name}&room=${room}`);

@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from 'react'
+import React,{useState,useEffect,useRef} from 'react'
 import Avatar from 'react-avatar';
 import { useLocation ,useNavigate} from 'react-router-dom';
 import axios from "axios";
@@ -8,7 +8,7 @@ import AceEditor from "react-ace";
 import io from "socket.io-client"
 import queryString from 'query-string'
 import Message from './Message';
-
+import SimplePeer from 'simple-peer';
 import Spinner from './Spinner';
 import "ace-builds/src-noconflict/mode-c_cpp";
 import "ace-builds/src-noconflict/mode-javascript";
@@ -40,9 +40,17 @@ import Container from './whiteboard/container/Container'
 
 
 let socket;
-
+let localStream = null;
+let peers = {}
 
 function Room({notify}) {
+  const [colormic, setColormic] = useState('red')
+  const [colorvid, setColorvid] = useState('green')
+  const [helppeers, sethelpPeers] = useState(true)
+  let muteButton=document.getElementById("muteButton")
+let videos=document.getElementById("videos")
+let localVideo=document.getElementById("localVideo");
+let vidButton=document.getElementById("vidButton")
 const [loading, setLoading] = useState(false)
   
   let navigate=useNavigate();
@@ -60,53 +68,327 @@ const [loading, setLoading] = useState(false)
   const [stdoutt, setStdo] = useState("");
   const [contri, setContri] = useState(false)
 
-// const ENDPOINT="http://localhost:5000";
-const ENDPOINT="https://codecollab7z2.onrender.com";
+const [help, sethelp] = useState(true)
 
-
-useEffect(() => {
-  
-    if(!localStorage.getItem('token1')){
-      navigate('/');
-      notify('Not Authorised: please Signin')
-    }
-   
-  
-
- const {name,room} =queryString.parse(location.search);
- if(!room ){
-  navigate('/join');
-  notify('Room is not created ');
-
- }
+  const configuration = {
  
- socket=io(ENDPOINT);
-
- if(!name){
-  setName(localStorage.getItem('email').split('@')[0]);
- }
-else{
-
-  setName(name);
-}
-  setRoom(room);
-  
-  socket.emit('join',{name:name?name:localStorage.getItem('email').split('@')[0],room,dp:localStorage.getItem('dp')},(error)=>{
-    if(error){
-    
-      navigate('/join');
-     notify("Username is taken")
+    "iceServers": [
+    {
+      urls: "stun:openrelay.metered.ca:80"
+    },
+    {
+      urls: "turn:openrelay.metered.ca:80",
+      username: "openrelayproject",
+      credential: "openrelayproject"
+    },
+    {
+      urls: "turn:openrelay.metered.ca:443",
+      username: "openrelayproject",
+      credential: "openrelayproject"
+    },
+    {
+      urls: "turn:openrelay.metered.ca:443?transport=tcp",
+      username: "openrelayproject",
+      credential: "openrelayproject"
     }
+  ]
+}
+
+/**
+ * UserMedia constraints
+ */
+
+  let constraints = {
+    audio: true,
+    video: {
+      facingMode: {
+        ideal: "user"
+    },
+        width: {
+            max: 100
+        },
+        height: {
+            max: 100
+        }
+    }}
+  
+  
+  
+   
+const ENDPOINT="http://localhost:5000";
+// const ENDPOINT="https://codecollab7z2.onrender.com";
+
+function removePeer(socket_id) {
+console.log(socket_id,"hjbh")
+  let videoEl = document.getElementById(socket_id)
+  if (videoEl) {
+
+      const tracks = videoEl.srcObject.getTracks();
+
+      tracks.forEach(function (track) {
+          track.stop()
+      })
+
+      videoEl.srcObject = null
+      videoEl.parentNode.removeChild(videoEl)
+  }
+  if (peers[socket_id]) peers[socket_id].destroy()
+  delete peers[socket_id]
+}
+
+/**
+* Creates a new peer connection and sets the event listeners
+
+*                  Set to true if the peer initiates the connection process.
+*                  Set to false if the peer receives the connection. 
+*/
+function addPeer(socket_id, am_initiator) {
+  console.log("enter added");
+  peers[socket_id] = new SimplePeer({
+      initiator: am_initiator,
+      stream: localStream,
+      config: configuration
   });
 
+  peers[socket_id].on('signal', data => {
 
-return ()=>{
-  socket.disconnect();
+      socket.emit('signal', {
+          signal: data,
+          socket_id: socket_id
+      })
+  });
+console.log(peers,socket_id);
+peers[socket_id].on('stream', stream => {
+  console.log("urh")
+  // sethelp(!help)
+    let newVid = document.createElement('video')
+let videos=document.getElementById("videos")
 
+    newVid.srcObject = stream
+    newVid.id = socket_id
+    newVid.playsinline = false
+    newVid.autoplay = true
+    newVid.muted=true
+    newVid.className = "vid"
+    newVid.onclick = () => openPictureMode(newVid)
+    newVid.ontouchstart = (e) => openPictureMode(newVid)
+    console.log(newVid);
+    videos.appendChild(newVid)
+    
+  })
+}
 
+/**
+* Opens an element in Picture-in-Picture mode
+* @param {HTMLVideoElement} el video element to put in pip mode
+*/
+function openPictureMode(el) {
+  console.log('opening pip')
+  el.requestPictureInPicture()
+}
+
+/**
+* Switches the camera between user and environment. It will just enable the camera 2 cameras not supported.
+*/
+function switchMedia() {
+  if (constraints.video.facingMode.ideal === 'user') {
+      constraints.video.facingMode.ideal = 'environment'
+  } else {
+      constraints.video.facingMode.ideal = 'user'
+  }
+
+  const tracks = localStream.getTracks();
+
+  tracks.forEach(function (track) {
+      track.stop()
+  })
+
+  localVideo.srcObject = null
+  navigator.mediaDevices.getUserMedia(constraints).then(stream => {
+
+      for (let socket_id in peers) {
+          for (let index in peers[socket_id].streams[0].getTracks()) {
+              for (let index2 in stream.getTracks()) {
+                  if (peers[socket_id].streams[0].getTracks()[index].kind === stream.getTracks()[index2].kind) {
+                      peers[socket_id].replaceTrack(peers[socket_id].streams[0].getTracks()[index], stream.getTracks()[index2], peers[socket_id].streams[0])
+                      break;
+                  }
+              }
+          }
+      }
+
+      localStream = stream
+      localVideo.srcObject = stream
+
+      updateButtons()
+  })
+}
+
+/**
+* Enable screen share
+*/
+function setScreen() {
+  navigator.mediaDevices.getDisplayMedia().then(stream => {
+      for (let socket_id in peers) {
+          for (let index in peers[socket_id].streams[0].getTracks()) {
+              for (let index2 in stream.getTracks()) {
+                  if (peers[socket_id].streams[0].getTracks()[index].kind === stream.getTracks()[index2].kind) {
+                      peers[socket_id].replaceTrack(peers[socket_id].streams[0].getTracks()[index], stream.getTracks()[index2], peers[socket_id].streams[0])
+                      break;
+                  }
+              }
+          }
+
+      }
+      localStream = stream
+
+      localVideo.srcObject = localStream
+      socket.emit('removeUpdatePeer', '')
+  })
+  updateButtons()
+}
+
+/**
+* Disables and removes the local stream and all the connections to other peers.
+*/
+function removeLocalStream() {
+  if (localStream) {
+      const tracks = localStream.getTracks();
+
+      tracks.forEach(function (track) {
+          track.stop()
+      })
+
+      localVideo.srcObject = null
+  }
+
+  for (let socket_id in peers) {
+      removePeer(socket_id)
+  }
+}
+
+/**
+* Enable/disable microphone
+*/
+function toggleMute() {
+//   for (let index in localStream.getAudioTracks()) {
+//     localStream.getAudioTracks()[index].enabled = !localStream.getAudioTracks()[index].enabled 
+    
+// }
+  localVideo.muted=!localVideo.muted
+  localVideo.muted?setColormic('red'):setColormic('green')
+  
+}
+/**
+* Enable/disable video
+*/
+function toggleVid() {
+  for (let index in localStream.getVideoTracks()) {
+      localStream.getVideoTracks()[index].enabled = !localStream.getVideoTracks()[index].enabled
+      localStream.getVideoTracks()[index].enabled?setColorvid('green'):setColorvid('red')
+  }
+}
+
+/**
+* updating text of buttons
+*/
+function updateButtons() {
+  for (let index in localStream.getVideoTracks()) {
+      vidButton.innerText = localStream.getVideoTracks()[index].enabled ? "Video Enabled" : "Video Disabled"
+  }
+  for (let index in localStream.getAudioTracks()) {
+      muteButton.innerText = localStream.getAudioTracks()[index].enabled ? "Unmuted" : "Muted"
+  }
 
 }
-}, [ENDPOINT,location.search,navigate,notify]);
+function init(){
+  if(!localStorage.getItem('token1')){
+    navigate('/');
+    notify('Not Authorised: please Signin')
+  }
+ 
+
+
+const {name,room} =queryString.parse(location.search);
+if(!room ){
+navigate('/join');
+notify('Room is not created ');
+
+}
+
+
+if(!name){
+setName(localStorage.getItem('email').split('@')[0]);
+}
+else{
+
+setName(name);
+}
+setRoom(room);
+socket.emit('join',{name:name?name:localStorage.getItem('email').split('@')[0],room,dp:localStorage.getItem('dp')},(error)=>{
+  if(error){
+  
+    navigate('/join');
+   notify("Username is taken")
+  }
+});
+
+socket.on('initReceive', async (socket_id) => {
+  console.log('INIT RECEIVE ' + socket_id);
+  addPeer(socket_id, false);
+  
+  socket.emit('initSend', socket_id);
+  // socket.emit("test","ok")
+  console.log("added")
+  // addPeer(socket_id, false);
+})
+
+
+socket.on('initSend', socket_id => {
+console.log('INIT SEND ' + socket_id)
+addPeer(socket_id, true)
+
+})
+
+socket.on('removePeer', socket_id => {
+  console.log('removing peer ' + socket_id)
+  removePeer(socket_id)
+})
+
+socket.on('disconnect', () => {
+  console.log('GOT DISCONNECTED')
+  for (let socket_id in peers) {
+      removePeer(socket_id)
+  }
+})
+
+socket.on('signal', data => {
+  peers[data.socket_id].signal(data.signal)
+})
+}
+useEffect(() => {
+  let localVideo=document.getElementById("localVideo")
+  socket=io(ENDPOINT);
+
+  navigator.mediaDevices.getUserMedia(constraints).then(stream => {
+      console.log('Received local stream');
+      localVideo.srcObject = stream;
+      localVideo.muted=true
+      localStream = stream;
+
+     init()
+  
+  }).catch(e =>console.log(e))
+  
+  
+  return ()=>{
+    socket.disconnect()
+  }
+
+}, []);
+
+
+
 
 useEffect(() => {
  
@@ -126,19 +408,19 @@ useEffect(() => {
   })
  }, [source,inp,stdoutt])
 
-const handlesendcode=()=>{
+const handlesendcode=(code)=>{
  
     socket.emit('sendCode',{
-     source:source,
+     source:localStorage.getItem('codereal'),
      inp:inp,
      out:stdoutt
     });
 }
 
   function onChange(newValue) {
-  
-setSource(newValue);
-
+    setSource(newValue);
+    localStorage.setItem('codereal',newValue);
+    handlesendcode();
   }
   function onChange1(newValue) {
     
@@ -199,47 +481,87 @@ setSource(newValue);
     }
 
     
-    const compile=()=>{
+    const compile=async()=>{
+      console.log(localStorage.getItem("tokencode"))
      setLoading(true);
-      axios.get(`https://judge0-ce.p.rapidapi.com/submissions/${localStorage.getItem("tokencode")}`,{  
-        headers: {
-            
-          'X-RapidAPI-Key': 'fdf905e00amsh129dca5d5ef50b9p1bf6b5jsnec112dfb068c',
-          'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
+   
+      const options = {
+        method: 'GET',
+        url: `https://judge0-ce.p.rapidapi.com/submissions/${localStorage.getItem("tokencode")}`,
+        params: {
+          base64_encoded: 'true',
+          fields: '*'
         },
-      })
-     .then(function (response) {
-     if(response.data.stdout){
-        setStdo(response.data.stdout);
-        setLoading(false);
-     }
-        else{
-        setStdo("Compilation Error")
-        setLoading(false);
+        headers: {
+          'X-RapidAPI-Key': '73c8c1ef10msh82919611afca92fp18bcdbjsn80fbc88f4f64',
+          'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
         }
-      }).catch(function (error) {
+      };
+      
+      try {
+
+        const response = await axios.request(options);
+        console.log(response.data);
+        let statusId = response.data.status?.id;
+console.log(statusId)
+        // Processed - we have a result
+        if (statusId === 1 || statusId === 2) {
+          // still processing
+          setTimeout(() => {
+            compile();
+          }, 2000);
+          
+        } else {
+          if(response.data.stdout){
+            console.log(statusId)
+            setStdo(atob(response.data.stdout));
+            console.log(response.data)
+            setLoading(false);
+         }
+            else{
+            // console.log(response.data.stdout,"hjgvyj")
+            console.log(statusId)
+            if(response.data.stderr)
+            setStdo(atob(response.data.stderr))
+           else
+            setStdo(atob(response.data.compile_output))
+            setLoading(false);
+            }
+        }
+       
+      } catch (error) {
         setLoading(false);
         console.error(error);
-      });
+      }
+     
+   
       
     }
 const compiler=async()=>{
   setLoading(true);
- let pro=await axios.post(`https://judge0-ce.p.rapidapi.com/submissions`,{"language_id":langid,"source_code":`${source}`,"stdin":`${inp}`},{  
-    headers: {
-        'Content-Type':'application/json', //not neccesary but its ok
-      'X-RapidAPI-Key': 'fdf905e00amsh129dca5d5ef50b9p1bf6b5jsnec112dfb068c',
-      'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
-    },
+  console.log(btoa("sachin"),typeof btoa("sachin"));
+  try {
+ let pro=await axios.post(`https://judge0-ce.p.rapidapi.com/submissions`,{"language_id":langid,"source_code":`${btoa(source)}`,"stdin":`${btoa(inp)}`},{  
+  headers: {
+    'content-type': 'application/json',
+    'Content-Type': 'application/json',
+    'X-RapidAPI-Key': '73c8c1ef10msh82919611afca92fp18bcdbjsn80fbc88f4f64',
+    'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
+  },
+  params: {
+    base64_encoded: 'true',
+    fields: '*'
+  },
     }
   )
-  try {
+ 
     const json= pro.data;
 const token=json.token;
+console.log(token)
 localStorage.setItem("tokencode",token);
 setLoading(false);
   } catch (error) {
-    setStdo("Compilation Error")
+    setStdo("Compilation Error")                                                                                                                                                          
     setLoading(false);
     console.log(error)
   }
@@ -254,8 +576,9 @@ setLoading(false);
 
   return (
     <>
+       
      {loading && <Spinner/>}
-    <Editornav source={source} contri={contri} setContri={setContri} notify={notify} download={download} whiteBoard={whiteBoard} setWhiteBoard={setWhiteBoard}  room={room} handlesendcode={handlesendcode} compiler={compiler} chat={chat} setChat={setChat}/>
+    <Editornav colormic={colormic} colorvid={colorvid} muteButton={muteButton} localVideo={localVideo} vidButton={vidButton} videos={videos} switchMedia={switchMedia} toggleMute={toggleMute} toggleVid={toggleVid} source={source} contri={contri} setContri={setContri} notify={notify} download={download} whiteBoard={whiteBoard} setWhiteBoard={setWhiteBoard}  room={room} handlesendcode={handlesendcode} compiler={compiler} chat={chat} setChat={setChat}/>
      
    {chat&& <div className="absolute right-0 w-[300px] border-2 h-[80vh] z-10">
     <div className='h-[73vh] bg-yellow-200 overflow-y-scroll'>
@@ -291,7 +614,7 @@ setLoading(false);
 
 
   <div className='hidden md:block p-4 bg-slate-200 overflow-y-scroll'>
-<p className='text-center p-2 text-blue-600 text-xl font-bold'>Contributors</p>
+<p  className='text-center p-2 text-blue-600 text-xl font-bold'>Contributors</p>
 <div>
   {users?
   <div>
