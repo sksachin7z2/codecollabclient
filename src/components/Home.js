@@ -24,21 +24,21 @@ function Home() {
        </div>
         </div>
         </div>
-     <hr />
+     {/* <hr /> */}
      </div>
      </section>
-     <section>
+     <section className='container m-auto'>
       <div className='py-3'>
         <div className='text-center font-bold text-[2rem] text-[#155bd7]'>Features</div>
       </div>
-      <div className="container m-[auto] pb-10">
+      <div className="container w-[90vw] m-[auto] pb-10">
       <div className='grid md:grid-cols-3 md:gap-3 md:grid-rows-none grid-rows-3 gap-4 '  >
-          <div className='rounded-md border-2 p-5'>
+          <div className='rounded-md  p-5'>
             <div className='h-[163px]'>
                 <img className='h-[100%] m-[auto]' src={code} alt="" />
             </div>
             <div >
-            <div className='text-[#ff9100] text-center py-4 text-[1.5rem] font-bold'>Versatile Code Editor
+            <div className='text-[#042967] text-center py-4 text-[1.5rem] font-bold'>Versatile Code Editor
                         </div>  
                         <div className='text-center '>
                           <p className='font-bold text-lg'>{`-> Supports multiple Languages`}</p>
@@ -47,12 +47,12 @@ function Home() {
                         </div>
             </div>
           </div>
-          <div className='rounded-md border-2 p-5'>
+          <div className='rounded-md  p-5'>
             <div className='h-[163px] '>
               <img className='h-[100%] m-[auto]' src={chat} alt=""  />
             </div>
             <div >
-            <div className='text-[#ff9100] text-center py-4 text-[1.5rem] font-bold'>Audio and text chat
+            <div className='text-[#042967] text-center py-4 text-[1.5rem] font-bold'>Audio and text chat
                         </div>  
                         <div className='text-center font-bold'>
                           <p className='font-bold text-lg'>{`-> Seamless audio connectivity`} </p>
@@ -60,12 +60,12 @@ function Home() {
                         </div>
             </div>
           </div>
-          <div className='rounded-md border-2 p-5'>
+          <div className='rounded-md  p-5'>
               <div className='h-[163px]'>
               <img className='h-[100%] m-[auto]' src={whiteboard} alt="" />
               </div>
               <div >
-            <div className='text-[#ff9100] text-center py-4 text-[1.5rem] font-bold'>Interative Whiteboard
+            <div className='text-[#042967] text-center py-4 text-[1.5rem] font-bold'>Interative Whiteboard
                         </div>  
                         <div className='text-center font-bold'>
                           <p className='font-bold text-lg'> {`-> Collabative whiteboard for explanation`}</p>
@@ -77,9 +77,7 @@ function Home() {
       </div>
       </div>
      </section>
-     <footer className='h-[10vh] bg-black flex justify-center items-center text-white font-bold'>
-        Code Collab : Developed by Sachin Sharma
-     </footer>
+   
     
     </>
   )

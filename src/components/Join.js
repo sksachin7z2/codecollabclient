@@ -81,10 +81,15 @@ setLoading(false);
             <div><input className='border-2 rounded-md p-1 border-blue-700' type="text"  placeholder='room' name="room" id="room" value={room} onChange={(e)=>{setRoom(e.target.value)}}/></div>
             <div className='space-x-3 text-center pt-2'>
               <button onClick={handlesubmit} className={`btn-primary ${(!name || !room)?"opacity-50  cursor-not-allowed":""}`}>Join</button>
-              <button onClick={handlecreate} className='btn-secondary'>Create Room</button>
+             
             </div>
          
-          
+          <div className='text-center text-xl font-semibold my-2'>
+            Or
+          </div>
+          <div className='text-center'>
+          <button onClick={handlecreate} className='btn-secondary'>Create Room</button>
+          </div>
         </div>
     </div>
     </>

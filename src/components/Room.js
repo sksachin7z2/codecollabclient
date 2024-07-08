@@ -3,7 +3,7 @@ import Avatar from 'react-avatar';
 import { useLocation ,useNavigate} from 'react-router-dom';
 import axios from "axios";
 import {BsFillDoorOpenFill} from 'react-icons/bs'
-// import {OTWhiteBoard} from 'opentok-react-whiteboard'
+
 import AceEditor from "react-ace";
 import io from "socket.io-client"
 import queryString from 'query-string'
@@ -168,7 +168,7 @@ let videos=document.getElementById("videos")
     newVid.id = socket_id
     newVid.playsinline = false
     newVid.autoplay = true
-    newVid.muted=true
+    // newVid.muted=true
     newVid.className = "vid"
     newVid.onclick = () => openPictureMode(newVid)
     newVid.ontouchstart = (e) => openPictureMode(newVid)

@@ -1,8 +1,5 @@
 import React,{useEffect} from 'react'
-// import {Link} from 'react-router-dom'
-import { OTSession, OTPublisher, OTStreams, OTSubscriber } from 'opentok-react';
-import '@opentok/client'
-import SimplePeer from 'simple-peer';
+
 import {BsFillChatLeftDotsFill,BsHeadset,BsShareFill,BsFileEarmarkArrowDown ,BsPlayFill,BsSaveFill,BsMic,BsCameraVideoFill, BsMicFill } from 'react-icons/bs'
 import {BiChalkboard} from 'react-icons/bi'
 
@@ -128,7 +125,7 @@ function Editornav({colormic,colorvid, muteButton,vidButton,localVideo,videos, s
       </OTSession> */}
    
    <div  id="videos" class="container flex">
-        <video  id="localVideo" class="vid" autoPlay ></video>
+        <video muted={true}  id="localVideo" class="vid" autoPlay ></video>
     </div>
 
     <div className='space-x-3 pt-2'>
