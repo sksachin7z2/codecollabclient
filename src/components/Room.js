@@ -271,12 +271,12 @@ function removeLocalStream() {
 * Enable/disable microphone
 */
 function toggleMute() {
-//   for (let index in localStream.getAudioTracks()) {
-//     localStream.getAudioTracks()[index].enabled = !localStream.getAudioTracks()[index].enabled 
-    
-// }
-  localVideo.muted=!localVideo.muted
-  localVideo.muted?setColormic('red'):setColormic('green')
+  for (let index in localStream.getAudioTracks()) {
+    localStream.getAudioTracks()[index].enabled = !localStream.getAudioTracks()[index].enabled 
+    localStream.getAudioTracks()[index].enabled?setColormic('green'):setColormic('red')
+}
+  // localVideo.muted=!localVideo.muted
+  // localVideo.muted?setColormic('red'):setColormic('green')
   
 }
 /**
