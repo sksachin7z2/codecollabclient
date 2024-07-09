@@ -44,7 +44,7 @@ let localStream = null;
 let peers = {}
 
 function Room({notify}) {
-  const [colormic, setColormic] = useState('red')
+  const [colormic, setColormic] = useState('green')
   const [colorvid, setColorvid] = useState('green')
   const [helppeers, sethelpPeers] = useState(true)
   let muteButton=document.getElementById("muteButton")
