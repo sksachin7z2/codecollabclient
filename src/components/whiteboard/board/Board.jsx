@@ -37,6 +37,19 @@ class Board extends React.Component {
     this.drawOnCanvas();
   }
 
+  componentWillUnmount() {
+    // Clean up the socket connection when the component is unmounted
+    if (this.socket) {
+      this.socket.emit('leavewhite', { room: this.a.room }); // Optional: Notify server the user left the room
+      this.socket.disconnect(); // Disconnect from the socket
+    }
+
+    // Clear any existing timeout to prevent memory leaks
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+    }
+  }
+
   componentWillReceiveProps(newProps) {
     const canvas = document.querySelector('#board');
     this.ctx.strokeStyle = newProps.color;
