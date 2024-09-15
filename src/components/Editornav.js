@@ -33,7 +33,7 @@ function Editornav({colormic,colorvid, muteButton,vidButton,localVideo,videos, s
    
     }
     // const host="http:localhost:5000";
-    const clienthost="https://codecollab7z2-8g25.onrender.com"
+    const clienthost="https://codecollabclient-93wj.vercel.app"
     const host="https://codecollab7z2-8g25.onrender.com";
 
   return (
