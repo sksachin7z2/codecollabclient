@@ -408,21 +408,26 @@ useEffect(() => {
   })
  }, [source,inp,stdoutt])
 
-const handlesendcode=(code)=>{
+const handlesendcode=(code,input,output)=>{
  
     socket.emit('sendCode',{
      source:code,
-     inp:inp,
-     out:stdoutt
+     inp:input,
+     out:output
     });
 }
 
   function onChange(newValue) {
     setSource(newValue);
-    handlesendcode(newValue);
+    handlesendcode(newValue,inp,stdoutt);
   }
   function onChange1(newValue) {
    setInp(newValue);
+    handlesendcode(source,newValue,stdoutt);
+  }
+    function onChange2(newValue) {
+    setStdo(newValue);
+      handlesendcode(source,inp,newValue);
   }
   const handlelang=(mode,name)=>{
       setMode(mode);
@@ -713,6 +718,7 @@ placeholder='output'
     value={stdoutt}
     width="auto"
     height='150px'
+    onChange={onChange2}
     fontSize={18}
     name="output"
     editorProps={{ $blockScrolling: true }}
