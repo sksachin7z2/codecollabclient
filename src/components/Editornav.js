@@ -5,7 +5,7 @@ import {BiChalkboard} from 'react-icons/bi'
 
 
 
-function Editornav({colormic,colorvid, muteButton,vidButton,localVideo,videos, switchMedia,toggleMute,toggleVid,source,chat,setChat,compiler,room,handlesendcode,whiteBoard,setWhiteBoard,download,notify,contri,setContri}) {
+function Editornav({handlesendcode1,colormic,colorvid, muteButton,vidButton,localVideo,videos, switchMedia,toggleMute,toggleVid,source,chat,setChat,compiler,room,handlesendcode,whiteBoard,setWhiteBoard,download,notify,contri,setContri}) {
 
 
   
@@ -63,7 +63,7 @@ function Editornav({colormic,colorvid, muteButton,vidButton,localVideo,videos, s
                 </li>
              <li  onMouseOver={()=>{document.getElementById('save').style.display="block"}} onMouseLeave={()=>{document.getElementById('save').style.display="none"}}>
                  <div>
-                 <button   onClick={handlesendcode} className='text-white text-lg sm:px-3'><BsSaveFill/></button>
+                 <button   onClick={handlesendcode1} className='text-white text-lg sm:px-3'><BsSaveFill/></button>
 
                  </div>
                  <div id='save' className='hidden text-white bg-black p-2 rounded-md absolute top-[7rem]'>
