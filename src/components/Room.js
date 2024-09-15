@@ -408,13 +408,21 @@ useEffect(() => {
   })
  }, [source,inp,stdoutt])
 
-const handlesendcode=(code,input,output)=>{
- 
+const handlesendcode=(...args)=>{
+ if (args.length>0){
     socket.emit('sendCode',{
-     source:code,
-     inp:input,
-     out:output
+     source:args[0],
+     inp:args[1],
+     out:args[2]
     });
+ }
+  else{
+     socket.emit('sendCode',{
+     source:source,
+     inp:inp,
+     out:stdoutt
+    });
+  }
 }
 
   function onChange(newValue) {
