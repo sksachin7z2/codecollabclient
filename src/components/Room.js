@@ -411,7 +411,7 @@ useEffect(() => {
 const handlesendcode=(code)=>{
  
     socket.emit('sendCode',{
-     source:localStorage.getItem('codereal'),
+     source:code,
      inp:inp,
      out:stdoutt
     });
@@ -419,11 +419,9 @@ const handlesendcode=(code)=>{
 
   function onChange(newValue) {
     setSource(newValue);
-    localStorage.setItem('codereal',newValue);
-    handlesendcode();
+    handlesendcode(newValue);
   }
   function onChange1(newValue) {
-    
    setInp(newValue);
   }
   const handlelang=(mode,name)=>{
