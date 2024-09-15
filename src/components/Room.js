@@ -409,22 +409,19 @@ useEffect(() => {
  }, [source,inp,stdoutt])
 
 const handlesendcode=(...args)=>{
- if (args.length>0){
     socket.emit('sendCode',{
      source:args[0],
      inp:args[1],
      out:args[2]
     });
- }
-  else{
-     socket.emit('sendCode',{
+}
+const handlesendcode1=()=>{
+   socket.emit('sendCode',{
      source:source,
      inp:inp,
      out:stdoutt
     });
-  }
 }
-
   function onChange(newValue) {
     setSource(newValue);
     handlesendcode(newValue,inp,stdoutt);
@@ -589,7 +586,7 @@ setLoading(false);
     <>
        
      {loading && <Spinner/>}
-    <Editornav colormic={colormic} colorvid={colorvid} muteButton={muteButton} localVideo={localVideo} vidButton={vidButton} videos={videos} switchMedia={switchMedia} toggleMute={toggleMute} toggleVid={toggleVid} source={source} contri={contri} setContri={setContri} notify={notify} download={download} whiteBoard={whiteBoard} setWhiteBoard={setWhiteBoard}  room={room} handlesendcode={handlesendcode} compiler={compiler} chat={chat} setChat={setChat}/>
+    <Editornav handlesendcode1={handlesendcode1} colormic={colormic} colorvid={colorvid} muteButton={muteButton} localVideo={localVideo} vidButton={vidButton} videos={videos} switchMedia={switchMedia} toggleMute={toggleMute} toggleVid={toggleVid} source={source} contri={contri} setContri={setContri} notify={notify} download={download} whiteBoard={whiteBoard} setWhiteBoard={setWhiteBoard}  room={room} handlesendcode={handlesendcode} compiler={compiler} chat={chat} setChat={setChat}/>
      
    {chat&& <div className="absolute right-0 w-[300px] border-2 h-[80vh] z-10">
     <div className='h-[73vh] bg-yellow-200 overflow-y-scroll'>
