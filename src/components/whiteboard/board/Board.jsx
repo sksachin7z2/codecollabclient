@@ -34,7 +34,7 @@ class Board extends React.Component {
                     root.isDrawing = false;
                 };
                 image.src = data;
-            }, 200)
+            }, 1)
         })
     }
 
@@ -61,7 +61,7 @@ class Board extends React.Component {
             root.timeout = setTimeout(function(){
                 var base64ImageData = canvas.toDataURL("image/png");
                 root.socket.emit("canvas-data", base64ImageData,root.a.room);
-            }, 200)
+            }, 1)
       
            
     }
@@ -117,7 +117,7 @@ class Board extends React.Component {
             root.timeout = setTimeout(function(){
                 var base64ImageData = canvas.toDataURL("image/png");
                 root.socket.emit("canvas-data", base64ImageData,root.a.room);
-            }, 500)
+            }, 1)
         };
     }
 
